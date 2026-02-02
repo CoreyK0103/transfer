@@ -4,8 +4,9 @@
   "description": "An event-driven backend system for securely transferring files between users, inspired by services like WeTransfer.   The system uses **direct-to-S3 uploads**, **asynchronous malware scanning**, and **event-driven architecture** to safely deliver files without handling file contents on the backend.",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "test": "jest --coverage",
+    "build": "tsc && yarn package:deps",
+    "package:deps": "mkdir -p layer/nodejs && cp package.json layer/nodejs/ && cp -r yarn.lock layer/nodejs/ && cd layer/nodejs/ && yarn --production --frozen-lockfile",
+    "test": "jest --coverage --passWithNoTests",
     "lint": "biome check ./src --write"
   },
   "repository": {

@@ -4,6 +4,19 @@ data "archive_file" "lambda_zip" {
   output_path = "${path.module}/../lambda.zip"
 }
 
+data "archive_file" "dependencies_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/../layer"
+  output_path = "${path.module}/../layer/dependencies.zip"
+}
+
+resource "aws_lambda_layer_version" "dependencies" {
+  filename            = data.archive_file.dependencies_zip.output_path
+  source_code_hash    = data.archive_file.dependencies_zip.output_base64sha256
+  layer_name          = "${local.resource_prefix}-dependencies"
+  compatible_runtimes = [var.lambda_runtime]
+}
+
 module "presigned_url" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda.git?ref=v8.4.0"
 
@@ -15,6 +28,10 @@ module "presigned_url" {
   local_existing_package = "${path.module}/../lambda.zip"
 
   cloudwatch_logs_retention_in_days = 1
+
+  layers = [
+    aws_lambda_layer_version.dependencies.arn,
+  ]
 
   environment_variables = {
     LANDING_BUCKET_NAME = module.landing_bucket.s3_bucket_id
