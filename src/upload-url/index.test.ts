@@ -1,4 +1,5 @@
 import type { S3Client } from "@aws-sdk/client-s3";
+import type { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import type {
 	APIGatewayProxyEventV2,
 	APIGatewayProxyResultV2,
@@ -8,6 +9,10 @@ import { getHandler } from "./index";
 
 jest.mock("@aws-sdk/s3-request-presigner", () => ({
 	getSignedUrl: jest.fn(() => "http://test.com"),
+}));
+
+jest.mock("node:crypto", () => ({
+	randomUUID: jest.fn(() => "random-id-1-2-3"),
 }));
 
 const event: APIGatewayProxyEventV2 = {
@@ -41,7 +46,7 @@ const event: APIGatewayProxyEventV2 = {
 
 describe("upload-url handler", () => {
 	it("should return a pre-signed URL", async () => {
-		const uut = getHandler(mock<S3Client>());
+		const uut = getHandler(mock<S3Client>(), mock<DynamoDBDocumentClient>());
 
 		const eventWithBody = {
 			...event,
@@ -66,8 +71,41 @@ describe("upload-url handler", () => {
 	});
 
 	it("should throw an error if no body is provided", async () => {
-		const uut = getHandler(mock<S3Client>());
+		const uut = getHandler(mock<S3Client>(), mock<DynamoDBDocumentClient>());
 
 		await expect(uut(event)).rejects.toThrow("No body provided");
+	});
+
+	it("should write file info to DynamoDB", async () => {
+		const dynamoDBClient = mock<DynamoDBDocumentClient>();
+
+		const eventWithBody = {
+			...event,
+			body: JSON.stringify({
+				filename: "test.txt",
+				contentType: "text/plain",
+				recipientEmail: "test@example.com",
+			}),
+		};
+
+		process.env.FILE_INFO_TABLE_NAME = "test-table";
+
+		const uut = getHandler(mock<S3Client>(), dynamoDBClient);
+
+		await uut(eventWithBody);
+
+		expect(dynamoDBClient.send).toHaveBeenCalledWith(
+			expect.objectContaining({
+				input: {
+					TableName: "test-table",
+					Item: {
+						fileId: "random-id-1-2-3",
+						filename: "test.txt",
+						contentType: "text/plain",
+						recipientEmail: "test@example.com",
+					},
+				},
+			}),
+		);
 	});
 });

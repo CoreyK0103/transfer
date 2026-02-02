@@ -34,12 +34,13 @@ module "presigned_url" {
   ]
 
   environment_variables = {
-    LANDING_BUCKET_NAME = module.landing_bucket.s3_bucket_id
+    LANDING_BUCKET_NAME  = module.landing_bucket.s3_bucket_id
+    FILE_INFO_TABLE_NAME = aws_dynamodb_table.file_info.name
   }
 
   attach_policy_statements = true
-  policy_statements = [
-    {
+  policy_statements = {
+    s3 = {
       effect = "Allow",
       actions = [
         "s3:PutObject"
@@ -47,8 +48,17 @@ module "presigned_url" {
       resources = [
         "${module.landing_bucket.s3_bucket_arn}/*",
       ]
+    },
+    dynamodb = {
+      effect = "Allow",
+      actions = [
+        "dynamodb:PutItem"
+      ],
+      resources = [
+        aws_dynamodb_table.file_info.arn
+      ]
     }
-  ]
+  }
 
   create_current_version_allowed_triggers = false
 

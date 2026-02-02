@@ -146,5 +146,7 @@ test.txt
 
 lambda.zip
 
+layer/
+
 **/terraform.tfstate
 **/terraform.tfstate.backup
