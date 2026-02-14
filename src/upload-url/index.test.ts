@@ -1,5 +1,5 @@
 import type { S3Client } from "@aws-sdk/client-s3";
-import type { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { PutCommandInput, type DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import type {
 	APIGatewayProxyEventV2,
 	APIGatewayProxyResultV2,
@@ -94,7 +94,7 @@ describe("upload-url handler", () => {
 
 		await uut(eventWithBody);
 
-		expect(dynamoDBClient.send).toHaveBeenCalledWith(
+		expect(dynamoDBClient.send).toHaveBeenCalledWith<PutCommandInput[]>(
 			expect.objectContaining({
 				input: {
 					TableName: "test-table",
