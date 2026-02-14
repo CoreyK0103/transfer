@@ -70,4 +70,77 @@ module "presigned_url" {
   }
 }
 
+module "file_router" {
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda.git?ref=v8.4.0"
 
+  function_name = "${local.resource_prefix}-scanned-file-router"
+  handler       = "file-router/index.handler"
+  runtime       = var.lambda_runtime
+
+  create_package         = false
+  local_existing_package = "${path.module}/../lambda.zip"
+
+  cloudwatch_logs_retention_in_days = 1
+
+  layers = [
+    aws_lambda_layer_version.dependencies.arn,
+  ]
+
+  environment_variables = {
+    CLEAN_BUCKET_NAME      = module.clean_bucket.s3_bucket_id
+    QUARANTINE_BUCKET_NAME = module.quarantine_bucket.s3_bucket_id
+  }
+
+  maximum_retry_attempts = 3
+  timeout                = var.lambda_timeout
+
+  attach_policy_statements = true
+  policy_statements = {
+    landingS3 = {
+      effect = "Allow",
+      actions = [
+        "s3:GetObject*"
+      ],
+      resources = [
+        "${module.landing_bucket.s3_bucket_arn}/*"
+      ]
+    },
+    s3 = {
+      effect = "Allow",
+      actions = [
+        "s3:PutObject*"
+      ],
+      resources = [
+        "${module.clean_bucket.s3_bucket_arn}/*",
+        "${module.quarantine_bucket.s3_bucket_arn}/*",
+      ]
+    },
+    sqs = {
+      effect = "Allow",
+      actions = [
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:ReceiveMessage"
+      ],
+      resources = [aws_sqs_queue.object_scanned.arn]
+    }
+  }
+
+  create_current_version_allowed_triggers = false
+
+  allowed_triggers = {
+    SQS = {
+      service    = "sqs",
+      source_arn = aws_sqs_queue.object_scanned.arn
+    }
+  }
+
+  event_source_mapping = {
+    SQS = {
+      event_source_arn                   = aws_sqs_queue.object_scanned.arn,
+      batch_size                         = 10,
+      maximum_batching_window_in_seconds = 5,
+      function_response_types            = ["ReportBatchItemFailures"]
+    }
+  }
+}
