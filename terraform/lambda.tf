@@ -99,7 +99,8 @@ module "file_router" {
     landingS3 = {
       effect = "Allow",
       actions = [
-        "s3:GetObject*"
+        "s3:GetObject*",
+        "s3:DeleteObject*"
       ],
       resources = [
         "${module.landing_bucket.s3_bucket_arn}/*"

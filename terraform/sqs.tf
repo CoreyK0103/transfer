@@ -42,4 +42,3 @@ data "aws_iam_policy_document" "object_scanned_queue_policy" {
     }
   }
 }
-
