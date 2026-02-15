@@ -1,0 +1,39 @@
+name: Teardown Prod
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-on-main:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      BUILD_ENV: prod
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'yarn'
+
+      - name: Build lambda code
+        run: |
+          yarn install:ci
+          yarn build
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: make init
+
+      - name: Destroy Prod Resources
+        working-directory: ./terraform
+        run: make destroy ARGS="-auto-approve"

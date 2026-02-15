@@ -5,6 +5,8 @@ The system uses **direct-to-S3 uploads**, **asynchronous malware scanning**, and
 
 This project is intentionally **backend-only**, focusing on cloud architecture, security, and event-driven design rather than frontend concerns. Third parties could build their own front-end and integrate with this system.
 
+Equipped with a CI/CD pipeline, the project can be deployed to a development environment (within PRs) and a production environment (on the main branch).
+
 ---
 
 ## 🧠 Motivation

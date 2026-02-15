@@ -14,3 +14,11 @@ variable "region" {
 variable "lambda_timeout" {
   type = number
 }
+
+variable "environment" {
+  type = string
+}
+
+variable "namespace" {
+  type = string
+}

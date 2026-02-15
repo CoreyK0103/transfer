@@ -68,6 +68,10 @@ module "presigned_url" {
       source_arn = "${aws_apigatewayv2_api.presigned_url_api.execution_arn}/*/*"
     }
   }
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 module "file_router" {
@@ -143,5 +147,9 @@ module "file_router" {
       maximum_batching_window_in_seconds = 5,
       function_response_types            = ["ReportBatchItemFailures"]
     }
+  }
+
+  tags = {
+    Environment = var.environment
   }
 }

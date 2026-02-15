@@ -12,6 +12,10 @@ module "landing_bucket" {
       }
     }
   ]
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 module "clean_bucket" {
@@ -28,6 +32,10 @@ module "clean_bucket" {
       }
     }
   ]
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 module "quarantine_bucket" {
@@ -44,4 +52,8 @@ module "quarantine_bucket" {
       }
     }
   ]
+
+  tags = {
+    Environment = var.environment
+  }
 }

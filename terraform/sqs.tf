@@ -6,10 +6,18 @@ resource "aws_sqs_queue" "object_scanned" {
     deadLetterTargetArn = aws_sqs_queue.object_scanned_dlq.arn
     maxReceiveCount     = 3
   })
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 resource "aws_sqs_queue" "object_scanned_dlq" {
   name = "${local.resource_prefix}-object-scanned-dlq"
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 resource "aws_sqs_queue_redrive_allow_policy" "object_scanned_redrive_allow_policy" {
