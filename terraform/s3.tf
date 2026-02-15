@@ -1,3 +1,4 @@
+# ---- Landing Bucket ----
 module "landing_bucket" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=v5.10.0"
 
@@ -18,6 +19,7 @@ module "landing_bucket" {
   }
 }
 
+# ---- Clean Bucket ---- 
 module "clean_bucket" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=v5.10.0"
 
@@ -38,6 +40,19 @@ module "clean_bucket" {
   }
 }
 
+resource "aws_s3_bucket_notification" "clean_object_notification" {
+  bucket = module.clean_bucket.s3_bucket_id
+
+  queue {
+    queue_arn     = aws_sqs_queue.clean_object_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_suffix = ".log"
+  }
+
+  depends_on = [aws_sqs_queue_policy.clean_object_queue_policy]
+}
+
+# ---- Quarantine Bucket ----
 module "quarantine_bucket" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-s3-bucket.git?ref=v5.10.0"
 

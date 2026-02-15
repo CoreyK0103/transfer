@@ -1,3 +1,4 @@
+# ---- Object Scan Result Rule and Target ----
 resource "aws_cloudwatch_event_rule" "object_scanned_rule" {
   name = "${local.resource_prefix}-object-scanned-rule"
 
