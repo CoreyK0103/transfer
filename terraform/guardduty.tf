@@ -7,8 +7,6 @@ resource "aws_guardduty_malware_protection_plan" "malware_protection" {
       object_prefixes = ["uploads"]
     }
   }
-
-  depends_on = [aws_cloudwatch_event_target.malware_protection]
 }
 
 resource "aws_iam_role" "guardduty_role" {
@@ -100,4 +98,3 @@ data "aws_iam_policy_document" "malware_protection" {
     ]
   }
 }
-

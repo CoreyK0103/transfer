@@ -10,3 +10,7 @@ variable "account_id" {
 variable "region" {
   type = string
 }
+
+variable "lambda_timeout" {
+  type = number
+}
