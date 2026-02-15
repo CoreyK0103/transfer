@@ -7,4 +7,8 @@ resource "aws_dynamodb_table" "file_info" {
     name = "fileId"
     type = "S"
   }
+
+  tags = {
+    Environment = var.environment
+  }
 }

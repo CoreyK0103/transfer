@@ -1,6 +1,10 @@
 resource "aws_apigatewayv2_api" "presigned_url_api" {
   name          = "${local.resource_prefix}-presigned-url-api"
   protocol_type = "HTTP"
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 resource "aws_apigatewayv2_integration" "lambda_integration" {
@@ -20,4 +24,8 @@ resource "aws_apigatewayv2_stage" "default_stage" {
   api_id      = aws_apigatewayv2_api.presigned_url_api.id
   name        = "$default"
   auto_deploy = true
+
+  tags = {
+    Environment = var.environment
+  }
 }

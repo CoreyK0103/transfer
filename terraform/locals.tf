@@ -1,3 +1,3 @@
 locals {
-  resource_prefix = "transfer"
+  resource_prefix = "${var.namespace}-transfer"
 }

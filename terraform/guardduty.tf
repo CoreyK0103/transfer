@@ -7,12 +7,20 @@ resource "aws_guardduty_malware_protection_plan" "malware_protection" {
       object_prefixes = ["uploads"]
     }
   }
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 resource "aws_iam_role" "guardduty_role" {
   name = "${local.resource_prefix}-guardduty-role"
 
   assume_role_policy = data.aws_iam_policy_document.guardduty_trust_policy.json
+
+  tags = {
+    Environment = var.environment
+  }
 }
 
 resource "aws_iam_role_policy" "guardduty_role" {
