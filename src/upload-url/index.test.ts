@@ -1,5 +1,8 @@
 import type { S3Client } from "@aws-sdk/client-s3";
-import { PutCommandInput, type DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import type {
+	DynamoDBDocumentClient,
+	PutCommandInput,
+} from "@aws-sdk/lib-dynamodb";
 import type {
 	APIGatewayProxyEventV2,
 	APIGatewayProxyResultV2,
