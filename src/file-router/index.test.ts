@@ -3,78 +3,51 @@ import type {
 	DeleteObjectCommandInput,
 	S3Client,
 } from "@aws-sdk/client-s3";
-import type { SQSEvent } from "aws-lambda";
+import type { SQSEvent, SQSRecord } from "aws-lambda";
 import { mock } from "jest-mock-extended";
+import type { GuardDutyMalwareProtectionObjectScanResult } from "../schema/aws/guardduty/guarddutymalwareprotectionobjectscanresult/GuardDutyMalwareProtectionObjectScanResult";
 import { getLambda } from "./index";
 
 const getMockEvent = (
 	bucketName: string,
 	key: string,
 	scanResultStatus: string,
-) => {
-	return {
-		version: "0",
-		id: "72c7d362-737a-6dce-fc78-9e27a0171419",
-		"detail-type": "GuardDuty Malware Protection Object Scan Result",
-		source: "aws.guardduty",
-		account: "111122223333",
-		time: "2024-02-28T01:01:01Z",
-		region: "us-east-1",
-		resources: [
-			"arn:aws:guardduty:us-east-1:111122223333:malware-protection-plan/b4c7f464ab3a4EXAMPLE",
-		],
-		detail: {
-			schemaVersion: "1.0",
-			scanStatus: "COMPLETED",
-			resourceType: "S3_OBJECT",
-			s3ObjectDetails: {
-				bucketName: bucketName,
-				objectKey: key,
-				eTag: "ASIAI44QH8DHBEXAMPLE",
-				versionId: "d41d8cd98f00b204e9800998eEXAMPLE",
-				s3Throttled: false,
-			},
-			scanResultDetails: {
-				scanResultStatus: scanResultStatus,
-				threats: null,
-			},
+) => ({
+	detail: {
+		schemaVersion: "1.0",
+		scanStatus: "COMPLETED",
+		resourceType: "S3_OBJECT",
+		s3ObjectDetails: {
+			bucketName: bucketName,
+			objectKey: key,
+			eTag: "eTag",
+			versionId: "version-id",
+			s3Throttled: false,
 		},
-	};
-};
+		scanResultDetails: {
+			scanResultStatus: scanResultStatus,
+			threats: [],
+		},
+	} as GuardDutyMalwareProtectionObjectScanResult,
+});
+
+const getSqsRecord = (
+	bucketName: string = "test-bucket",
+	key: string = "uuid/test.txt",
+	scanResultStatus: string = "NO_THREATS_FOUND",
+): SQSRecord =>
+	({
+		messageId: "mock-message-id",
+		body: JSON.stringify(getMockEvent(bucketName, key, scanResultStatus)),
+	}) as SQSRecord;
 
 const getSqsEvent = (
 	bucketName: string = "test-bucket",
 	key: string = "uuid/test.txt",
 	scanResultStatus: string = "NO_THREATS_FOUND",
-): SQSEvent => {
-	return {
-		Records: [
-			{
-				messageId: "059f36b4-87a3-44ab-83d2-661975830a7d",
-				receiptHandle: "AQEBwJnKyrHigUMZj6rYigCgxlaS3SLy0a...",
-				body: JSON.stringify(getMockEvent(bucketName, key, scanResultStatus)),
-				attributes: {
-					ApproximateReceiveCount: "1",
-					SentTimestamp: "1545082649183",
-					SenderId: "AIDAIENQZJOLO23YVJ4VO",
-					ApproximateFirstReceiveTimestamp: "1545082649185",
-				},
-				messageAttributes: {
-					myAttribute: {
-						stringValue: "myValue",
-						stringListValues: [],
-						binaryListValues: [],
-						dataType: "String",
-					},
-				},
-				md5OfBody: "e4e68fb7bd0e697a0ae8f1bb342846b3",
-				eventSource: "aws:sqs",
-				eventSourceARN: "arn:aws:sqs:us-east-2:123456789012:my-queue",
-				awsRegion: "us-east-2",
-			},
-		],
-	};
-};
+): SQSEvent => ({
+	Records: [getSqsRecord(bucketName, key, scanResultStatus)],
+});
 
 describe("file-router handler", () => {
 	it("should process the event and return an empty batchItemFailures array", async () => {
@@ -101,7 +74,7 @@ describe("file-router handler", () => {
 		expect(response).toEqual({
 			batchItemFailures: [
 				{
-					itemIdentifier: "059f36b4-87a3-44ab-83d2-661975830a7d",
+					itemIdentifier: "mock-message-id",
 				},
 			],
 		});
@@ -170,7 +143,7 @@ describe("file-router handler", () => {
 		expect(response).toEqual({
 			batchItemFailures: [
 				{
-					itemIdentifier: "059f36b4-87a3-44ab-83d2-661975830a7d",
+					itemIdentifier: "mock-message-id",
 				},
 			],
 		});
