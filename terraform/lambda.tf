@@ -207,7 +207,8 @@ module "notifier" {
       actions = [
         "ses:SendEmail",
         "ses:SendRawEmail"
-      ]
+      ],
+      resources = [data.aws_sesv2_email_identity.email_sender.arn],
       conditions = [
         {
           test     = "StringEquals"
