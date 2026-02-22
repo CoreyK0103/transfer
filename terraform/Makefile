@@ -14,15 +14,15 @@ validate:
 
 plan:
 	@echo "Planning Terraform changes using $(VAR_FILE)..."
-	terraform plan -var-file=terraform.tfvars -var-file=$(VAR_FILE)
+	terraform plan -var-file=$(VAR_FILE)
 
 apply:
 	@echo "Applying Terraform changes using $(VAR_FILE)..."
-	terraform apply -var-file=terraform.tfvars -var-file=$(VAR_FILE) $(ARGS)
+	terraform apply -var-file=$(VAR_FILE) $(ARGS)
 
 destroy:
 	@echo "Destroying Terraform-managed infrastructure using $(VAR_FILE)..."
-	terraform destroy -var-file=terraform.tfvars -var-file=$(VAR_FILE) $(ARGS)
+	terraform destroy -var-file=$(VAR_FILE) $(ARGS)
 
 fmt:
 	@echo "Formatting Terraform code..."

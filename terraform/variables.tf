@@ -1,6 +1,7 @@
 variable "lambda_runtime" {
   description = "The runtime environment for the Lambda function."
   type        = string
+  default     = "nodejs24.x"
 }
 
 variable "account_id" {
@@ -8,11 +9,13 @@ variable "account_id" {
 }
 
 variable "region" {
-  type = string
+  type    = string
+  default = "eu-west-2"
 }
 
 variable "lambda_timeout" {
-  type = number
+  type    = number
+  default = 30
 }
 
 variable "environment" {
@@ -21,4 +24,13 @@ variable "environment" {
 
 variable "namespace" {
   type = string
+}
+
+variable "email_sender" {
+  type = string
+}
+
+variable "batch_size" {
+  type    = number
+  default = 10
 }
