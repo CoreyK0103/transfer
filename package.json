@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "install:ci": "yarn install --frozen-lockfile",
+    "install:ci:prod": "yarn install --production --frozen-lockfile",
     "build": "tsc && yarn package:deps",
     "package:deps": "mkdir -p layer/nodejs && cp package.json layer/nodejs/ && cp -r yarn.lock layer/nodejs/ && cd layer/nodejs/ && yarn --production --frozen-lockfile",
     "test": "jest --coverage --passWithNoTests",

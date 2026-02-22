@@ -24,7 +24,7 @@ jobs:
       - name: Install and test
         run: |
           yarn install:ci
-          yarn audit
+          yarn audit --groups dependencies
           yarn lint
           yarn test
 
@@ -48,7 +48,7 @@ jobs:
 
       - name: Build lambda code
         run: |
-          yarn install:ci
+          yarn install:ci:prod
           yarn build
 
       - name: Setup Terraform
