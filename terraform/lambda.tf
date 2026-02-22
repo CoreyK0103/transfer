@@ -106,8 +106,8 @@ module "file_router" {
     landingS3 = {
       effect = "Allow",
       actions = [
-        "s3:GetObject*",
-        "s3:DeleteObject*"
+        "s3:GetObject",
+        "s3:DeleteObject"
       ],
       resources = [
         "${module.landing_bucket.s3_bucket_arn}/*"
@@ -116,7 +116,7 @@ module "file_router" {
     s3 = {
       effect = "Allow",
       actions = [
-        "s3:PutObject*"
+        "s3:PutObject"
       ],
       resources = [
         "${module.clean_bucket.s3_bucket_arn}/*",
@@ -184,6 +184,15 @@ module "notifier" {
 
   attach_policy_statements = true
   policy_statements = {
+    s3 = {
+      effect = "Allow",
+      actions = [
+        "s3:GetObject"
+      ],
+      resources = [
+        "${module.clean_bucket.s3_bucket_arn}/*"
+      ]
+    }
     sqs = {
       effect = "Allow",
       actions = [
