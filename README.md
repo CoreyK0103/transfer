@@ -9,6 +9,13 @@ Equipped with a CI/CD pipeline, the project can be deployed to a development env
 
 ---
 
+## TODO
+
+- Ignore S3 test event middleware
+- Middleware to handle SQS batch events
+
+---
+
 ## 🧠 Motivation
 
 This project explores a **cloud-native, event-driven approach** where:
