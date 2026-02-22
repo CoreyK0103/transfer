@@ -48,7 +48,7 @@ jobs:
 
       - name: Build lambda code
         run: |
-          yarn install:ci:prod
+          yarn install:ci
           yarn build
 
       - name: Setup Terraform
