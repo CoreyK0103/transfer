@@ -142,8 +142,6 @@ vite.config.ts.timestamp-*
 
 **/.DS_Store
 
-test.txt
-
 lambda.zip
 
 layer/

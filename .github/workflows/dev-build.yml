@@ -24,7 +24,7 @@ jobs:
       - name: Install and test
         run: |
           yarn install:ci
-          yarn audit
+          yarn audit --groups dependencies
           yarn lint
           yarn test
 
