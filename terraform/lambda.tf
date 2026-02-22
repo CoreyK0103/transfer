@@ -202,6 +202,20 @@ module "notifier" {
         aws_dynamodb_table.file_info.arn
       ]
     }
+    ses = {
+      effect = "Allow",
+      actions = [
+        "ses:SendEmail",
+        "ses:SendRawEmail"
+      ]
+      conditions = [
+        {
+          test     = "StringEquals"
+          variable = "ses:FromAddress"
+          values   = [var.email_sender]
+        }
+      ]
+    }
   }
 
   create_current_version_allowed_triggers = false

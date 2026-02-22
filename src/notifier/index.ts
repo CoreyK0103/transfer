@@ -98,6 +98,10 @@ export const getLambda = (
 
 		results.forEach((result, index) => {
 			if (result.status === "rejected") {
+				logger.error("Failed to process event", {
+					event: event.Records[index],
+					error: result.reason,
+				});
 				batchItemFailures.push({
 					itemIdentifier: event.Records[index].messageId,
 				});
