@@ -31,7 +31,7 @@ The result is a system that is **scalable, secure, and loosely coupled**.
 
 At a high level, the system consists of:
 
-- **API service** for issuing upload permissions
+- **API Gateway** (with JWT authorization) for issuing upload permissions
 - **S3 buckets** for ingestion, clean files, and quarantined files
 - **EventBridge** for routing events
 - **Lambda functions** for processing steps
@@ -44,15 +44,16 @@ At a high level, the system consists of:
 
 ## 🔁 High-Level Workflow
 
-1. A client requests permission to upload a file
-2. The backend issues a **pre-signed S3 PUT URL**
-3. The client uploads the file directly to S3
-4. S3 emits an object creation event
-5. GuardDuty asynchronously scans the file for malware
-6. Based on the scan result:
+1. A client authenticates with a valid JWT token
+2. The client requests permission to upload a file
+3. The backend issues a **pre-signed S3 PUT URL**
+4. The client uploads the file directly to S3
+5. S3 emits an object creation event
+6. GuardDuty asynchronously scans the file for malware
+7. Based on the scan result:
    - Clean files are moved to a secure download bucket
    - Malicious files are quarantined
-7. The recipient is notified via email with a pre-signed download link (if clean)
+8. The recipient is notified via email with a pre-signed download link (if clean)
 
 All processing beyond the initial request is **fully event-driven**.
 
@@ -90,10 +91,15 @@ This enables:
 **Cloud & Infrastructure**
 - AWS S3
 - AWS Lambda
+- AWS API Gateway (with JWT authorization)
 - AWS EventBridge
 - AWS GuardDuty (Malware Protection for S3)
 - AWS SES
 - AWS DynamoDB
+
+**Authentication & Authorization**
+- OIDC (OpenID Connect) for AWS credentials
+- JWT (JSON Web Tokens) for API authorization
 
 **Backend**
 - NodeJS
@@ -114,6 +120,9 @@ This project can be tested entirely from the command line.
 ```bash
 POST /uploads
 ```
+
+Requires:
+- Valid JWT token in the `Authorization` header
 
 Returns:
 - Upload ID
