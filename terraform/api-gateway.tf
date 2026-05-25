@@ -8,7 +8,7 @@ resource "aws_apigatewayv2_api" "presigned_url_api" {
 }
 
 resource "aws_apigatewayv2_authorizer" "cognito" {
-  api_id = aws_apigatewayv2_api.api.id
+  api_id = aws_apigatewayv2_api.presigned_url_api.id
   name   = "${local.resource_prefix}-cognito-authorizer"
 
   authorizer_type = "JWT"
